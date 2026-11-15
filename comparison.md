@@ -76,6 +76,14 @@ As reported by the author (not measurable from the repo):
 - The `kyo` (tui4s) version was written by Haiku.
 - The code written by the models is the application; the libraries compared are third-party.
 
+Metals MCP (the compiler, source and symbol tools of the Scala language server; `prompt/1.md` asks to use it) was used
+in one session only, counted from the tool calls in the 17 Claude Code transcripts of this project on 2026-11-15:
+
+- The Haiku session of the `kyo` version made 37 calls: `inspect` 14, `get-source` 6, `glob-search` 4,
+  `typed-glob-search` 4, `list-modules` 3, `compile-full` 2, `find-dep` 2, `get-docs` 2.
+- The other 16 transcripts, including all Sonnet sessions (`jatatui`, `termflow`, `lanterna`), made no Metals call.
+  They compiled and tested with `sbt` and read library APIs with `javap`, `grep` and the library sources.
+
 ## Problems met
 
 Problems 1–4 were met and fixed in this session. For the other three stacks only what the repo records is listed; their
