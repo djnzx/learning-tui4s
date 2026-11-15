@@ -49,8 +49,23 @@ lazy val termflow = (project in file("termflow"))
     libraryDependencies += "org.llm4s" %% "termflow-app" % "0.4.0"
   )
 
+/** jatatui: Java port of ratatui (core, widgets and the crossterm backend, JNI to Rust, needs native access); the app runs on cats-effect and fs2 */
+lazy val jatatui = (project in file("jatatui"))
+  .dependsOn(core)
+  .settings(commonSettings, forkedRun)
+  .settings(
+    run / javaOptions += "--enable-native-access=ALL-UNNAMED",
+    libraryDependencies ++= Seq(
+      "com.olvind.jatatui" % "jatatui-core"      % "0.31.0",
+      "com.olvind.jatatui" % "jatatui-widgets"   % "0.31.0",
+      "com.olvind.jatatui" % "jatatui-crossterm" % "0.31.0",
+      "org.typelevel"     %% "cats-effect"       % "3.7.1",
+      "co.fs2"            %% "fs2-core"          % "3.14.0"
+    )
+  )
+
 lazy val root = (project in file("."))
-  .aggregate(core, lanterna, termflow)
+  .aggregate(core, lanterna, termflow, jatatui)
   .settings(
     name           := "learning-tui4s",
     publish / skip := true
