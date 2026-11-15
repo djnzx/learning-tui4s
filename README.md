@@ -1,6 +1,17 @@
 # learning-tui4s
 
-A Scala 3 terminal UI project built on [tui4s](https://github.com/yuri4n/tui4s).
+A Scala 3 terminal UI project: a Midnight Commander-style folder browser (`jnz.FolderViewApp`) built on
+[jatatui](https://github.com/oyvindberg/jatatui) (a Java port of ratatui) and the Typelevel stack (cats-effect, fs2).
+The earlier [tui4s](https://github.com/yuri4n/tui4s)/kyo version is on the `kyo` branch.
+
+## Run
+
+```shell
+sbt run
+```
+
+Keys: Up/Down (`k`/`j`), PageUp/PageDown, Home/End, Enter or Right to open a folder, Backspace or Left to go up,
+F10 or `q` to quit. Needs a real terminal.
 
 ## Metals
 
