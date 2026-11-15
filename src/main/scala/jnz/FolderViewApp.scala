@@ -113,14 +113,15 @@ object FolderViewApp extends KyoApp:
         val e = st.entries(index)
         val on = index == st.selected
         val text = line(if on then ">" else " ", e.name, sizeOf(e), width)
-        div(span(text).style(if on then Style.empty.bold else Style.empty))
+        val style = if on then Style.empty.bold else Style.empty
+        div(span(text).style(style.whiteSpace(_.pre)))
       else div(span(""))
     }
     val footer = if st.message.nonEmpty then st.message else footerKeys
     div(
-      div(span(st.dir.toString.take(width)).style(Style.empty.bold)),
+      div(span(cut(st.dir.toString, width)).style(Style.empty.bold)),
       UI.fragment(listed*),
-      div(span(footer.take(width))),
+      div(span(cut(footer, width))),
     )
 
   private def sizeOf(e: Entry): String =
@@ -128,9 +129,28 @@ object FolderViewApp extends KyoApp:
     else if e.isDir then "<DIR>"
     else e.size.toString
 
-  /** One row: the marker and the name on the left, the size on the right, cut to `width`. */
+  /** One row: the marker and the name on the left, the size on the right, `width` cells in all. */
   private def line(mark: String, name: String, size: String, width: Int): String =
     val sizeWidth = 12
-    val nameWidth = math.max(1, width - sizeWidth - 2)
-    val left = s"$mark ${name.take(nameWidth)}"
-    String.format(s"%-${nameWidth + 2}s%${sizeWidth}s", left, size.takeRight(sizeWidth)).take(width)
+    val left = fit(s"$mark $name", math.max(0, width - sizeWidth))
+    cut(left + String.format(s"%${sizeWidth}s", size.takeRight(sizeWidth)), width)
+
+  /** The cells a code point takes on the terminal: a wide character (CJK, emoji) takes two, the others one. */
+  private def cells(cp: Int): Int =
+    val wide =
+      (0x1100 to 0x115f).contains(cp) || (0x2e80 to 0xa4cf).contains(cp) || (0xac00 to 0xd7a3).contains(cp) ||
+        (0xf900 to 0xfaff).contains(cp) || (0xfe30 to 0xfe4f).contains(cp) || (0xff00 to 0xff60).contains(cp) ||
+        (0xffe0 to 0xffe6).contains(cp) || (0x1f300 to 0x1f64f).contains(cp) || (0x1f680 to 0x1f6ff).contains(cp) ||
+        (0x1f900 to 0x1f9ff).contains(cp) || (0x20000 to 0x3fffd).contains(cp)
+    if wide then 2 else 1
+
+  /** The longest start of `text` that takes at most `width` cells. */
+  private def cut(text: String, width: Int): String =
+    val cps = text.codePoints.toArray
+    val used = cps.scanLeft(0)(_ + cells(_)).tail
+    new String(cps, 0, used.takeWhile(_ <= width).length)
+
+  /** `text` cut to `width` cells and padded with spaces to take exactly `width` cells. */
+  private def fit(text: String, width: Int): String =
+    val kept = cut(text, width)
+    kept + " " * math.max(0, width - kept.codePoints.toArray.map(cells).sum)
