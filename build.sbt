@@ -2,12 +2,12 @@ import scala.collection.Seq
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-name := "scala-template"
-version := "0.0.1"
+name := "learning-tui4s"
+version := "0.1.0"
 
 scalaVersion := "3.9.0"
 
-javacOptions := Seq("-source", "17", "-target", "17")
+javacOptions := Seq("-source", "25", "-target", "25")
 
 scalacOptions ++= Seq(
   "-encoding",
@@ -22,6 +22,17 @@ scalacOptions ++= Seq(
   "-Wunused:all",
   //  "-Xfatal-warnings",
   "-Wvalue-discard"
+)
+
+/** tui4s runs in the real terminal: the app gets its own JVM with the native access and the scheduler values of tui4s */
+Compile / run / fork        := true
+Compile / run / connectInput := true
+Compile / run / javaOptions ++= Seq(
+  "--enable-native-access=ALL-UNNAMED",
+  "-Dkyo.scheduler.cycleIntervalNs=10000000",
+  "-Dkyo.scheduler.blockingMonitorIntervalNs=20000000",
+  "-Dkyo.scheduler.blockingMonitorMinIntervalNs=20000000",
+  "-Dkyo.scheduler.regulator.concurrencyCollectIntervalMs=100"
 )
 
 libraryDependencies ++= Seq(

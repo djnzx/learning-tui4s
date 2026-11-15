@@ -3,3 +3,5 @@ project/project
 .bloop
 .idea
 .bsp
+.metals
+.mcp.json
