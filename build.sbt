@@ -64,8 +64,27 @@ lazy val jatatui = (project in file("jatatui"))
     )
   )
 
+/** tui4s: a terminal runner for kyo-ui on Kyo (release candidate); it brings kyo-core, kyo-ui and jatatui. Needs native access and the scheduler values of tui4s */
+lazy val tui4kyo = (project in file("tui4kyo"))
+  .dependsOn(core)
+  .settings(commonSettings, forkedRun)
+  .settings(
+    run / connectInput := true,
+    run / javaOptions ++= Seq(
+      "--enable-native-access=ALL-UNNAMED",
+      "-Dkyo.scheduler.cycleIntervalNs=10000000",
+      "-Dkyo.scheduler.blockingMonitorIntervalNs=20000000",
+      "-Dkyo.scheduler.blockingMonitorMinIntervalNs=20000000",
+      "-Dkyo.scheduler.regulator.concurrencyCollectIntervalMs=100"
+    ),
+    libraryDependencies ++= Seq(
+      "io.github.yuri4n" %% "tui4s-runner"  % "0.1.1-RC1",
+      "io.github.yuri4n" %% "tui4s-testkit" % "0.1.1-RC1" % Test
+    )
+  )
+
 lazy val root = (project in file("."))
-  .aggregate(core, lanterna, termflow, jatatui)
+  .aggregate(core, lanterna, termflow, jatatui, tui4kyo)
   .settings(
     name           := "learning-tui4s",
     publish / skip := true

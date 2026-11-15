@@ -26,18 +26,18 @@ Run each check in a shell; app runs are checked in a real terminal (Terminal.app
 - [x] `sbt lanterna/test` green; commit
 
 ### 3. `termflow`
-- [ ] Module with dependency `org.llm4s:termflow:0.4.0`, packages `jnz.termflow`; sources from branch `termflow`
-- [ ] Tests `KeysSpec`, `FolderViewSpec` (`view` test); `sbt termflow/test` green; commit
+- [x] Module with dependency `org.llm4s:termflow:0.4.0`, packages `jnz.termflow`; sources from branch `termflow`
+- [x] Tests `KeysSpec`, `FolderViewSpec` (`view` test); `sbt termflow/test` green; commit
 
 ### 4. `jatatui`
-- [ ] Module with `jatatui-core`, `-widgets`, `-crossterm` 0.31.0, `cats-effect`, `fs2-core` (only what compiles), `run / fork`, native access
-- [ ] Sources and tests from branch `jatatui`; `sbt jatatui/test` green; commit
+- [x] Module with `jatatui-core`, `-widgets`, `-crossterm` 0.31.0, `cats-effect`, `fs2-core` (only what compiles), `run / fork`, native access
+- [x] Sources and tests from branch `jatatui`; `sbt jatatui/test` green; commit
 
 ### 5. `tui4kyo`
-- [ ] Find the smallest tui4s artifact set that compiles the old app
-- [ ] Tests first: `KeysSpec` (key → `Action`), `FolderViewSpec` (screen text / bold via `FolderLines`) – red
-- [ ] Refactor to `core`: `State` in the `SignalRef`, `FolderModel(...)` in `Sync.defer`, `FolderLines` for text; tests green
-- [ ] `sbt tui4kyo/test` green; commit
+- [x] Find the smallest tui4s artifact set that compiles the old app
+- [x] Tests first: `KeysSpec` (key → `Action`), `FolderViewSpec` (screen text / bold via `FolderLines`) – red
+- [x] Refactor to `core`: `State` in the `SignalRef`, `FolderModel(...)` in `Sync.defer`, `FolderLines` for text; tests green
+- [x] `sbt tui4kyo/test` green; commit
 
 ### 6. Run each module
 - [ ] `sbt "lanterna/runMain jnz.lanterna.FolderViewApp"` draws, `j`+Return, `q` exits 0 (Terminal.app)
