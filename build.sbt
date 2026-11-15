@@ -24,7 +24,11 @@ scalacOptions ++= Seq(
   "-Wvalue-discard"
 )
 
-/** Lanterna needs the real terminal: `sbt run` has no tty, so the app is started from the staged script (`sbt stage`) */
+/** Lanterna needs the real terminal: `sbt run` forks the app and hands it stdin and stdout, so the app owns the terminal */
+run / fork := true
+run / connectInput := true
+run / outputStrategy := Some(StdoutOutput)
+
 enablePlugins(JavaAppPackaging)
 
 libraryDependencies ++= Seq(

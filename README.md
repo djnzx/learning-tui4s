@@ -8,11 +8,19 @@ Earlier versions: [tui4s](https://github.com/yuri4n/tui4s)/kyo on the `kyo` bran
 ## Run
 
 ```shell
+sbt run
+```
+
+or, without sbt running the app:
+
+```shell
 sbt stage
 target/universal/stage/bin/learning-tui4s
 ```
 
-`sbt run` does not work: the forked JVM has no tty, so Lanterna cannot take over the terminal.
+`run` is forked with the terminal's stdin and stdout handed to the app (`build.sbt`), so Lanterna owns the terminal.
+The terminal size comes from `stty size` (`SttyTerminal`): Lanterna's own query for it waits for ever in a terminal that
+does not answer the cursor-position request.
 
 Keys: Up/Down (`k`/`j`), PageUp/PageDown, Home/End, Enter or Right to open a folder, Backspace or Left to go up,
 F10 or `q` to quit. Needs a real terminal.

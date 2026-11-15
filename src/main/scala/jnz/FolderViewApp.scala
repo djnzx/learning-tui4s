@@ -4,7 +4,6 @@ import com.googlecode.lanterna.input.KeyStroke
 import com.googlecode.lanterna.input.KeyType
 import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.screen.TerminalScreen
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.annotation.tailrec
@@ -53,7 +52,7 @@ object FolderViewApp:
 
   def main(args: Array[String]): Unit =
     val _        = args
-    val terminal = DefaultTerminalFactory().createTerminal()
+    val terminal = SttyTerminal()
     val screen   = TerminalScreen(terminal)
     val resized  = AtomicBoolean(false)
     terminal.addResizeListener((_, _) => resized.set(true))
