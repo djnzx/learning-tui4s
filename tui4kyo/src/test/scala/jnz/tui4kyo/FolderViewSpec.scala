@@ -64,3 +64,13 @@ class FolderViewSpec extends AnyFlatSpec with Matchers:
     val ended = run(started(folder()).flatMap(h => h.char('q').andThen(h.awaitEnd(5.seconds))))
     ended shouldBe true
   }
+
+  it should "keep the whole page of entries while scrolling a big folder" in {
+    val dir = Files.createTempDirectory("folderview-big").toRealPath()
+    (0 until 60).foreach(i => Files.writeString(dir.resolve(f"file$i%02d.txt"), "x"))
+    val screens = run(Headless.start(100, 12)(_ => FolderViewApp.ui(dir)).flatMap { h =>
+      val keys = Vector.fill(12)(kyo.UI.Keyboard.ArrowDown) ++ Vector(kyo.UI.Keyboard.PageDown, kyo.UI.Keyboard.End, kyo.UI.Keyboard.ArrowUp, kyo.UI.Keyboard.PageUp, kyo.UI.Keyboard.Home)
+      Kyo.foreach(keys)(k => h.key(k).andThen(h.lines))
+    })
+    screens.foreach(_.slice(1, 11).count(_.trim.nonEmpty) shouldBe 10)
+  }

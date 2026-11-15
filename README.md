@@ -32,6 +32,7 @@ PageUp/PageDown, Home/End, Enter or Right to open a folder, Backspace or Left to
 
 Notes:
 
+- Under sbt the list of `jatatui` and `tui4kyo` can lose the rows under the selection (see the next section; use `java`).
 - `runMain` is forked (`run / fork`, in `build.sbt`): the app has its own JVM and starts in the folder of its module
   (`lanterna/`, `termflow/`, ...), so that is the first folder shown.
 - sbt pipes the stdin and stdout of a forked app, which shows an empty screen in a real terminal. `lanterna` and `termflow`
@@ -41,6 +42,56 @@ Notes:
   `SttyTerminal` reads the size from `stty size` instead.
 - `jatatui` (JNI to the Rust crossterm crate) and `tui4kyo` need `--enable-native-access=ALL-UNNAMED`; `tui4kyo` also sets
   the Kyo scheduler properties of tui4s. Both are in `build.sbt`.
+
+## Run without sbt, with `java`
+
+Prefer this to `sbt runMain` when the list loses rows: while sbt runs a forked app it writes its own terminal sequences, and
+after every frame it erases the screen from the cursor down (`ESC[0J`, seen in the output of `jatatui` under sbt). The cursor
+is then one row below the selection, so after moving up only one entry below the cursor stays visible. A plain `java` has
+no such output and the app starts in the folder where it is run, not in the module folder.
+
+Run each block in the project folder. The app shows the folder where it is started, here the project folder; to browse
+another one, put `cd <folder>` before the `java` line (the classpath is absolute, so it still works). The classpath comes
+from sbt (`export <module>/Runtime/fullClasspath`: the module's classes, `core` and the libraries) and is read again at every
+start, so a build change is picked up after `sbt compile`. `tail -1` keeps the classpath, the last line: sbt may print other
+lines to stdout before it (for example JVM flags set by `JAVA_TOOL_OPTIONS` or `.jvmopts`).
+
+`lanterna`:
+
+```shell
+sbt -batch compile
+CP=$(sbt -batch -error "export lanterna/Runtime/fullClasspath" | tail -1)
+java -cp "$CP" jnz.lanterna.FolderViewApp
+```
+
+`termflow` (the option only silences JLine's native-access warning):
+
+```shell
+sbt -batch compile
+CP=$(sbt -batch -error "export termflow/Runtime/fullClasspath" | tail -1)
+java --enable-native-access=ALL-UNNAMED -cp "$CP" jnz.termflow.FolderViewApp
+```
+
+`jatatui`:
+
+```shell
+sbt -batch compile
+CP=$(sbt -batch -error "export jatatui/Runtime/fullClasspath" | tail -1)
+java --enable-native-access=ALL-UNNAMED -cp "$CP" jnz.jatatui.FolderViewApp
+```
+
+`tui4kyo` (the four `kyo.scheduler` properties are the ones tui4s asks for):
+
+```shell
+sbt -batch compile
+CP=$(sbt -batch -error "export tui4kyo/Runtime/fullClasspath" | tail -1)
+java --enable-native-access=ALL-UNNAMED \
+  -Dkyo.scheduler.cycleIntervalNs=10000000 \
+  -Dkyo.scheduler.blockingMonitorIntervalNs=20000000 \
+  -Dkyo.scheduler.blockingMonitorMinIntervalNs=20000000 \
+  -Dkyo.scheduler.regulator.concurrencyCollectIntervalMs=100 \
+  -cp "$CP" jnz.tui4kyo.FolderViewApp
+```
 
 ## Test
 
