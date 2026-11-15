@@ -4,6 +4,7 @@ import java.nio.file.Paths
 import jnz.Action
 import jnz.FolderModel
 import jnz.State
+import scala.util.Try
 import termflow.tui.*
 import termflow.tui.KeyDecoder.InputKey
 import termflow.tui.Tui.*
@@ -59,4 +60,4 @@ object FolderViewApp extends TuiApp[FolderViewApp.Model, FolderViewApp.Msg]:
 
   def main(args: Array[String]): Unit =
     val _ = args
-    TuiRuntime.run(this)
+    TuiRuntime.run(this, terminalBackend = Try(TtyTerminalBackend()).getOrElse(JLineTerminalBackend()))

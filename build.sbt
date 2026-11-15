@@ -46,6 +46,7 @@ lazy val termflow = (project in file("termflow"))
   .dependsOn(core)
   .settings(commonSettings, forkedRun)
   .settings(
+    run / javaOptions += "--enable-native-access=ALL-UNNAMED",
     libraryDependencies += "org.llm4s" %% "termflow-app" % "0.4.0"
   )
 
@@ -54,6 +55,7 @@ lazy val jatatui = (project in file("jatatui"))
   .dependsOn(core)
   .settings(commonSettings, forkedRun)
   .settings(
+    run / connectInput := true,
     run / javaOptions += "--enable-native-access=ALL-UNNAMED",
     libraryDependencies ++= Seq(
       "com.olvind.jatatui" % "jatatui-core"      % "0.31.0",

@@ -40,12 +40,23 @@ Run each check in a shell; app runs are checked in a real terminal (Terminal.app
 - [x] `sbt tui4kyo/test` green; commit
 
 ### 6. Run each module
-- [ ] `sbt "lanterna/runMain jnz.lanterna.FolderViewApp"` draws, `j`+Return, `q` exits 0 (Terminal.app)
-- [ ] same for `termflow`, `jatatui`, `tui4kyo`; fix `fork`/`javaOptions`/`connectInput` per module; record findings
-- [ ] `sbt test` (all modules) green; commit
+- [x] `sbt "lanterna/runMain jnz.lanterna.FolderViewApp"` draws, `j`+Return, `q` exits 0 (Terminal.app)
+- [x] same for `termflow`, `jatatui`, `tui4kyo`; fix `fork`/`javaOptions`/`connectInput` per module; record findings (below)
+- [x] `sbt test` (all modules) green; commit
 
 ### 7. Docs
 - [ ] README: modules, run commands, tests, known issues (Kyo display bug), Metals section kept verbatim, docs index
 - [ ] `comparison.md`: one-build note (modules, run commands)
 - [ ] Check no `.md`/spec/plan/prompt content from the branches is lost (`git diff --stat` against each branch for `*.md`, `docs`, `prompt`)
 - [ ] Commit
+
+## Findings of task 6 (checks in a real Terminal.app window; first screen after 4–6 s of sbt startup, `q` exits with 0)
+
+- `lanterna`: works with `fork`; `SttyTerminal` opens `/dev/tty`. `stty` code moved to `core` (`Stty`), shared with termflow.
+- `jatatui`: needs `connectInput` (crossterm: "Failed to initialize input reader" without it) and the native access flag.
+- `tui4kyo`: works with `fork`, `connectInput`, native access and the four Kyo scheduler properties.
+- `termflow`: under sbt's fork JLine gets pipes, creates a dumb terminal and the screen stays empty. Fix: its own
+  `TtyTerminalBackend` (TermFlow's `TerminalBackend`) on `/dev/tty` with `stty` for raw mode and size, WINCH handler for
+  resize. TermFlow closes the key reader at the end while its thread is blocked in `read`; `InputStreamReader.close`
+  waits for the next key, so the app seemed to hang after `q`. The reader is wrapped with a `close` that does nothing.
+- The forked JVM starts in the module folder (`termflow/`, ...), so the shown folder at start is the module folder.
