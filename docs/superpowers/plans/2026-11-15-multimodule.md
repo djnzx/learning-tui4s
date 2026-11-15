@@ -45,10 +45,10 @@ Run each check in a shell; app runs are checked in a real terminal (Terminal.app
 - [x] `sbt test` (all modules) green; commit
 
 ### 7. Docs
-- [ ] README: modules, run commands, tests, known issues (Kyo display bug), Metals section kept verbatim, docs index
-- [ ] `comparison.md`: one-build note (modules, run commands)
-- [ ] Check no `.md`/spec/plan/prompt content from the branches is lost (`git diff --stat` against each branch for `*.md`, `docs`, `prompt`)
-- [ ] Commit
+- [x] README: modules, run commands, tests, known issues (Kyo display bug), Metals section kept verbatim, docs index
+- [x] `comparison.md`: one-build note (modules, run commands)
+- [x] Check no `.md`/spec/plan/prompt content from the branches is lost (`git diff --stat` against each branch for `*.md`, `docs`, `prompt`)
+- [x] Commit
 
 ## Findings of task 6 (checks in a real Terminal.app window; first screen after 4–6 s of sbt startup, `q` exits with 0)
 
