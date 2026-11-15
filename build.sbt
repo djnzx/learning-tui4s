@@ -24,15 +24,11 @@ scalacOptions ++= Seq(
   "-Wvalue-discard"
 )
 
-/** tui4s runs in the real terminal: the app gets its own JVM with the native access and the scheduler values of tui4s */
+/** the app runs in the real terminal: it gets its own JVM with the native access that crossterm needs */
 Compile / run / fork        := true
 Compile / run / connectInput := true
 Compile / run / javaOptions ++= Seq(
-  "--enable-native-access=ALL-UNNAMED",
-  "-Dkyo.scheduler.cycleIntervalNs=10000000",
-  "-Dkyo.scheduler.blockingMonitorIntervalNs=20000000",
-  "-Dkyo.scheduler.blockingMonitorMinIntervalNs=20000000",
-  "-Dkyo.scheduler.regulator.concurrencyCollectIntervalMs=100"
+  "--enable-native-access=ALL-UNNAMED"
 )
 
 libraryDependencies ++= Seq(
@@ -54,12 +50,10 @@ libraryDependencies ++= Seq(
   "org.scalacheck"    %% "scalacheck"              % "1.20.0",
   "org.scalatestplus" %% "scalacheck-1-20"         % "3.2.20.0",
   "org.mockito"       %% "mockito-scala-scalatest" % "2.2.3",
-  /** tui4s: terminal UI runner, app and testkit */
-  "io.github.yuri4n"  %% "tui4s-runner"            % "0.1.1-RC1",
-  "io.github.yuri4n"  %% "tui4s-app"               % "0.1.1-RC1",
-  "io.github.yuri4n"  %% "tui4s-widgets"           % "0.1.1-RC1",
-  "io.github.yuri4n"  %% "tui4s-use"               % "0.1.1-RC1",
-  "io.github.yuri4n"  %% "tui4s-testkit"           % "0.1.1-RC1" % Test,
+  /** jatatui: Java port of ratatui (core, widgets and the crossterm backend) */
+  "com.olvind.jatatui" % "jatatui-core"      % "0.31.0",
+  "com.olvind.jatatui" % "jatatui-widgets"   % "0.31.0",
+  "com.olvind.jatatui" % "jatatui-crossterm" % "0.31.0",
   /** colored & informative output */
   "com.lihaoyi"       %% "pprint"                  % "0.9.6"
 )
