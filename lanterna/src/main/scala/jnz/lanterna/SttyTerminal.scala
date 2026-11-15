@@ -1,4 +1,4 @@
-package jnz
+package jnz.lanterna
 
 import com.googlecode.lanterna.TerminalSize
 import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal.CtrlCBehaviour

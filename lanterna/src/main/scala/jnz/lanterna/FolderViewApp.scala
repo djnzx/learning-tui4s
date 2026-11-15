@@ -1,10 +1,13 @@
-package jnz
+package jnz.lanterna
 
 import com.googlecode.lanterna.input.KeyStroke
 import com.googlecode.lanterna.input.KeyType
 import com.googlecode.lanterna.screen.Screen
 import com.googlecode.lanterna.screen.TerminalScreen
 import java.nio.file.Paths
+import jnz.Action
+import jnz.FolderModel
+import jnz.State
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.annotation.tailrec
 

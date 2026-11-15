@@ -1,5 +1,6 @@
-package jnz
+package jnz.lanterna
 
+import jnz.Action
 import com.googlecode.lanterna.input.KeyStroke
 import com.googlecode.lanterna.input.KeyType
 import org.scalatest.flatspec.AnyFlatSpec

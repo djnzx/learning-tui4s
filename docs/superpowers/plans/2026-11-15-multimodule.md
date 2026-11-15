@@ -14,16 +14,16 @@ Run each check in a shell; app runs are checked in a real terminal (Terminal.app
 ## Tasks
 
 ### 1. Skeleton and `core`
-- [ ] Root `build.sbt`: `commonSettings`, aggregate root (`publish / skip`), `core` project; delete old root sources
-- [ ] `core/src/main/scala/jnz/FolderModel.scala` moved unchanged (`git mv`), `FolderModelSpec` moved to `core/src/test`
-- [ ] `FolderLines` (test first): `FolderLinesSpec` from the pure tests of `FolderViewSpec`, then `FolderLines.lines`
-- [ ] `sbt core/test` green; commit
+- [x] Root `build.sbt`: `commonSettings`, aggregate root (`publish / skip`), `core` project; delete old root sources
+- [x] `core/src/main/scala/jnz/FolderModel.scala` moved unchanged (`git mv`), `FolderModelSpec` moved to `core/src/test`
+- [x] `FolderLines` (test first): `FolderLinesSpec` from the pure tests of `FolderViewSpec`, then `FolderLines.lines`
+- [x] `sbt core/test` green; commit
 
 ### 2. `lanterna`
-- [ ] Module with dependency `com.googlecode.lanterna:lanterna:3.1.5`, `run / fork`, packages `jnz.lanterna`
-- [ ] Move `FolderViewApp`, `FolderView.draw`, `SttyTerminal`; `FolderView` uses `FolderLines`
-- [ ] Move `KeysSpec`, `FolderViewSpec` (draw tests), `SttyTerminalSpec`
-- [ ] `sbt lanterna/test` green; commit
+- [x] Module with dependency `com.googlecode.lanterna:lanterna:3.1.5`, `run / fork`, packages `jnz.lanterna`
+- [x] Move `FolderViewApp`, `FolderView.draw`, `SttyTerminal`; `FolderView` uses `FolderLines`
+- [x] Move `KeysSpec`, `FolderViewSpec` (draw tests), `SttyTerminalSpec`
+- [x] `sbt lanterna/test` green; commit
 
 ### 3. `termflow`
 - [ ] Module with dependency `org.llm4s:termflow:0.4.0`, packages `jnz.termflow`; sources from branch `termflow`
