@@ -9,6 +9,7 @@ import jatatui.crossterm.CrosstermBackend
 import jatatui.crossterm.Jatatui
 import java.nio.file.Paths
 import tui.crossterm.CrosstermJni
+import tui.crossterm.Duration
 import tui.crossterm.Event
 import tui.crossterm.KeyCode
 import tui.crossterm.KeyEventKind
@@ -67,6 +68,14 @@ object FolderViewApp extends IOApp.Simple:
       yield ()
     }
 
-  /** Terminal events as they come; `read` blocks, so cancelling the stream interrupts the wait. */
+  private val pollTimeout = new Duration(0L, 100_000_000)
+
+  /**
+   * Terminal events as they come. The native `read` cannot be interrupted, so the wait is split into short `poll`s
+   * and `read` runs only when an event is ready; cancelling the stream takes effect between the polls.
+   */
   private def events(ct: CrosstermJni): Stream[IO, Event] =
-    Stream.repeatEval(IO.interruptible(ct.read()))
+    Stream
+      .repeatEval(IO.blocking(ct.poll(pollTimeout)))
+      .filter(identity)
+      .evalMap(_ => IO.blocking(ct.read()))

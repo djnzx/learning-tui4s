@@ -42,6 +42,11 @@ class FolderViewSpec extends AnyFlatSpec with Matchers:
     rows(3) should startWith("> c.txt")
   }
 
+  it should "keep the selection visible after the terminal shrinks" in {
+    val rows = drawn(state(selected = 4, top = 0), 40, 4)
+    rows(2) should startWith("> c.txt")
+  }
+
   it should "show the message instead of the key hints" in {
     drawn(state(message = "boom"), 40, 6).last.trim shouldBe "boom"
   }

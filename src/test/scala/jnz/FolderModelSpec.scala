@@ -3,6 +3,7 @@ package jnz
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermissions
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -88,6 +89,28 @@ class FolderModelSpec extends AnyFlatSpec with Matchers:
     failed.entries shouldBe prev.entries
     failed.message should not be empty
     FolderModel(failed, Action.LineDown, 3).message shouldBe ""
+  }
+
+  it should "report a folder without read permission and keep the previous state" in {
+    val d      = sampleDir()
+    val locked = d.resolve("c")
+    val prev   = FolderModel.initial(d, 10)
+    Files.setPosixFilePermissions(locked, PosixFilePermissions.fromString("---------"))
+    try
+      assume(!Files.isReadable(locked), "running with rights that ignore permissions (root)")
+      val failed = FolderModel.visit(prev, locked, None, 10)
+      failed.dir shouldBe prev.dir
+      failed.entries shouldBe prev.entries
+      failed.message should include("AccessDenied")
+    finally Files.setPosixFilePermissions(locked, PosixFilePermissions.fromString("rwx------"))
+  }
+
+  it should "clear the message when Open or Parent changes nothing" in {
+    val onFile = FolderModel.initial(sampleDir(), 10)
+    val file   = onFile.copy(selected = onFile.entries.indexWhere(_.name == "b.txt"), message = "boom")
+    FolderModel(file, Action.Open, 10).message shouldBe ""
+    val root = FolderModel.initial(Paths.get("/"), 10).copy(message = "boom")
+    FolderModel(root, Action.Parent, 10).message shouldBe ""
   }
 
   it should "survive an empty entry list" in {

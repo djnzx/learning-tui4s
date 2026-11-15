@@ -77,13 +77,13 @@ object FolderModel:
     selectedEntry(st) match
       case Some(e) if e.name == ".." => up(st, page)
       case Some(e) if e.isDir        => visit(st, st.dir.resolve(e.name), None, page)
-      case _                         => st
+      case _                         => st.copy(message = "")
 
   /** Goes to the parent folder and selects the folder that was left. */
   private def up(st: State, page: Int): State =
     Option(st.dir.getParent) match
       case Some(parent) => visit(st, parent, Option(st.dir.getFileName).map(_.toString), page)
-      case None         => st
+      case None         => st.copy(message = "")
 
   def sizeOf(e: Entry): String =
     if e.name == ".." then "UP--DIR"
