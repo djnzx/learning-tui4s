@@ -57,7 +57,3 @@ class FolderViewSpec extends AnyFlatSpec with Matchers:
   it should "make the header and the selected entry bold" in {
     FolderView.lines(state(selected = 1), 40, 6).map(_._2) shouldBe Vector(true, false, true, false, false, false)
   }
-
-  "view" should "put a text node on every row of the terminal" in {
-    FolderView.view(state(), 40, 6).children should have size 6
-  }

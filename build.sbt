@@ -24,14 +24,14 @@ scalacOptions ++= Seq(
   "-Wvalue-discard"
 )
 
-/** TermFlow needs the real terminal: `sbt run` has no tty, so the app is started from the staged script (`sbt stage`) */
+/** Lanterna needs the real terminal: `sbt run` has no tty, so the app is started from the staged script (`sbt stage`) */
 enablePlugins(JavaAppPackaging)
 
 Universal / javaOptions ++= Seq("-J--enable-native-access=ALL-UNNAMED")
 
 libraryDependencies ++= Seq(
-  /** TermFlow: Elm-architecture terminal UI */
-  "org.llm4s"     %% "termflow"       % "0.4.0",
+  /** Lanterna: terminal screen and key input */
+  "com.googlecode.lanterna" % "lanterna" % "3.1.5",
   /** testing */
   "org.scalatest" %% "scalatest"      % "3.2.20"
 )
