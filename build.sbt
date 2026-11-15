@@ -41,8 +41,16 @@ lazy val lanterna = (project in file("lanterna"))
     libraryDependencies += "com.googlecode.lanterna" % "lanterna" % "3.1.5"
   )
 
+/** TermFlow: Elm-architecture terminal UI (the app layer with the terminal and the screen, without the widgets) */
+lazy val termflow = (project in file("termflow"))
+  .dependsOn(core)
+  .settings(commonSettings, forkedRun)
+  .settings(
+    libraryDependencies += "org.llm4s" %% "termflow-app" % "0.4.0"
+  )
+
 lazy val root = (project in file("."))
-  .aggregate(core, lanterna)
+  .aggregate(core, lanterna, termflow)
   .settings(
     name           := "learning-tui4s",
     publish / skip := true
