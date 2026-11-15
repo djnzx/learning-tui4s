@@ -11,6 +11,13 @@ Numbers about GitHub were read with the GitHub API on 2026-11-15. Everything abo
 | `termflow` | [TermFlow](https://github.com/llm4s/termflow) | 0.4.0 |
 | `lanterna` | [Lanterna](https://github.com/mabe02/lanterna) | 3.1.5 |
 
+All four now live in one sbt build (modules `core`, `lanterna`, `termflow`, `jatatui`, `tui4kyo`; see `README.md` for
+`sbt "<module>/runMain jnz.<module>.FolderViewApp"`). The shared `core` holds the model and the screen text; the tui4s/Kyo
+version was refactored onto it, and the `stty` code of Lanterna moved into `core` and serves TermFlow too. The sections
+below describe each version as it was first written on its branch. One fact from the combined build: TermFlow also
+needed its own terminal backend on `/dev/tty` to show anything under `sbt runMain` (JLine gets pipes and falls back to a
+dumb terminal), and closing its key reader blocked until the next key.
+
 ## What was built, per stack
 
 Common to `jatatui`, `termflow` and `lanterna`: the pure model `FolderModel.scala` (116 lines, identical in all three:

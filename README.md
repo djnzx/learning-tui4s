@@ -1,30 +1,71 @@
 # learning-tui4s
 
-A Scala 3 terminal UI project: a Midnight Commander-style folder browser (`jnz.FolderViewApp`) built on
-[Lanterna](https://github.com/mabe02/lanterna) (a Java terminal library, used through its `Screen` API).
-Earlier versions: [tui4s](https://github.com/yuri4n/tui4s)/kyo on the `kyo` branch, jatatui on the `jatatui` branch,
-[TermFlow](https://llm4s.github.io/termflow/) on the `termflow` branch.
+One app, four terminal UI stacks, one sbt build. The app is `FolderViewApp`: a full-screen, responsive, Midnight Commander-style
+folder browser (default colors, no configuration; the task is in [`prompt/1.md`](prompt/1.md)). It was written four times on
+four libraries and the versions are compared in [`comparison.md`](comparison.md).
+
+| Module | Library | Main class |
+|---|---|---|
+| `core` | the shared pure part: the model of the folder (`FolderModel`), the text of the screen (`FolderLines`), `stty` helpers (`Stty`); no library dependency | none |
+| `lanterna` | [Lanterna](https://github.com/mabe02/lanterna) (Java), `Screen` API | `jnz.lanterna.FolderViewApp` |
+| `termflow` | [TermFlow](https://llm4s.github.io/termflow/) (Scala 3, Elm architecture) | `jnz.termflow.FolderViewApp` |
+| `jatatui` | [jatatui](https://github.com/oyvindberg/jatatui) (Java port of ratatui) on cats-effect and fs2 | `jnz.jatatui.FolderViewApp` |
+| `tui4kyo` | [tui4s](https://github.com/yuri4n/tui4s) on [Kyo](https://getkyo.io) (release candidate) | `jnz.tui4kyo.FolderViewApp` |
+
+Each stack module depends on `core` and on its library only; `jatatui` is the only one that sees cats-effect and fs2.
+The four implementations also exist as they were first written, one per branch: `kyo` (tui4s, also `master`), `jatatui`,
+`termflow` and `lanterna` (`comparison` adds `comparison.md` to the Lanterna one).
 
 ## Run
 
-```shell
-sbt run
-```
-
-or, without sbt running the app:
+Needs a real terminal (iTerm2, Terminal.app, the terminal of an IDE) and JDK 25. Start one module from the project folder:
 
 ```shell
-sbt stage
-target/universal/stage/bin/learning-tui4s
+sbt "lanterna/runMain jnz.lanterna.FolderViewApp"
+sbt "termflow/runMain jnz.termflow.FolderViewApp"
+sbt "jatatui/runMain jnz.jatatui.FolderViewApp"
+sbt "tui4kyo/runMain jnz.tui4kyo.FolderViewApp"
 ```
 
-`run` is forked (`build.sbt`) and the app opens `/dev/tty` itself (`SttyTerminal`), because sbt's piping of the forked app's
-stdin and stdout shows nothing in a real terminal.
-The terminal size comes from `stty size` (`SttyTerminal`): Lanterna's own query for it waits for ever in a terminal that
-does not answer the cursor-position request.
+The first screen appears after sbt has started (4–6 s on the development machine). Keys: Up/Down (`k`/`j`),
+PageUp/PageDown, Home/End, Enter or Right to open a folder, Backspace or Left to go up, F10 or `q` to quit.
 
-Keys: Up/Down (`k`/`j`), PageUp/PageDown, Home/End, Enter or Right to open a folder, Backspace or Left to go up,
-F10 or `q` to quit. Needs a real terminal.
+Notes:
+
+- `runMain` is forked (`run / fork`, in `build.sbt`): the app has its own JVM and starts in the folder of its module
+  (`lanterna/`, `termflow/`, ...), so that is the first folder shown.
+- sbt pipes the stdin and stdout of a forked app, which shows an empty screen in a real terminal. `lanterna` and `termflow`
+  therefore open `/dev/tty` themselves (`SttyTerminal`, `TtyTerminalBackend`) and read the size and the raw mode with `stty`
+  (`Stty` in `core`). `jatatui` and `tui4kyo` run with `connectInput`.
+- Lanterna's own query for the terminal size waits for ever in a terminal that does not answer the cursor-position request;
+  `SttyTerminal` reads the size from `stty size` instead.
+- `jatatui` (JNI to the Rust crossterm crate) and `tui4kyo` need `--enable-native-access=ALL-UNNAMED`; `tui4kyo` also sets
+  the Kyo scheduler properties of tui4s. Both are in `build.sbt`.
+
+## Test
+
+```shell
+sbt test                 # all modules, no terminal needed
+sbt core/test            # the model and the screen text
+sbt lanterna/test        # keys, drawing on Lanterna's virtual terminal, stty size
+sbt termflow/test        # keys, the view tree
+sbt jatatui/test         # keys, drawing into a jatatui buffer
+sbt tui4kyo/test         # keys, the app on tui4s's headless run
+```
+
+## Known issues
+
+- `tui4kyo`: the author reports a display bug in the tui4s/Kyo version that the Lanterna and TermFlow versions do not have.
+  It was not investigated; the refactoring onto `core` keeps the behavior of the original `kyo` version.
+- tui4s is a release candidate (`0.1.1-RC1`, on Kyo and kyo-ui release candidates).
+
+## Documents
+
+- [`comparison.md`](comparison.md): the four stacks side by side (facts, problems met, metrics).
+- [`prompt/1.md`](prompt/1.md): the task.
+- [`docs/superpowers/specs`](docs/superpowers/specs) and [`docs/superpowers/plans`](docs/superpowers/plans): the designs and
+  plans, one pair for the jatatui version, one pair for the Lanterna version and one pair for this multi-module build. The
+  kyo and TermFlow versions were written without a spec or a plan.
 
 ## Metals
 
