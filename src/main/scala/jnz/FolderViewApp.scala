@@ -2,6 +2,10 @@ package jnz
 
 import com.googlecode.lanterna.input.KeyStroke
 import com.googlecode.lanterna.input.KeyType
+import com.googlecode.lanterna.screen.Screen
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory
+import java.nio.file.Paths
+import scala.annotation.tailrec
 
 /** The folder browser on a Lanterna screen. */
 object FolderViewApp:
@@ -26,5 +30,28 @@ object FolderViewApp:
           case _                      => None
       case _                                     => None
 
+  private val pollMillis = 20L
+
+  /** Resizes, draws and polls for a key until a quit action; the state changes only through `FolderModel`. */
+  @tailrec
+  private def loop(screen: Screen, state: State): Unit =
+    val _ = screen.doResizeIfNecessary()
+    FolderView.draw(screen, state)
+    screen.pollInput() match
+      case null                                   =>
+        Thread.sleep(pollMillis)
+        loop(screen, state)
+      case key                                    =>
+        toAction(key) match
+          case Some(Action.Quit) => ()
+          case Some(action)      => loop(screen, FolderModel(state, action, FolderModel.rows(screen.getTerminalSize.getRows)))
+          case None              => loop(screen, state)
+
   def main(args: Array[String]): Unit =
-    val _ = args
+    val _      = args
+    val screen = DefaultTerminalFactory().createScreen()
+    screen.startScreen()
+    try
+      val start = Paths.get("").toAbsolutePath.normalize
+      loop(screen, FolderModel.initial(start, FolderModel.rows(screen.getTerminalSize.getRows)))
+    finally screen.stopScreen()

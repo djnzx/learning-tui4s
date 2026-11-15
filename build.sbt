@@ -27,8 +27,6 @@ scalacOptions ++= Seq(
 /** Lanterna needs the real terminal: `sbt run` has no tty, so the app is started from the staged script (`sbt stage`) */
 enablePlugins(JavaAppPackaging)
 
-Universal / javaOptions ++= Seq("-J--enable-native-access=ALL-UNNAMED")
-
 libraryDependencies ++= Seq(
   /** Lanterna: terminal screen and key input */
   "com.googlecode.lanterna" % "lanterna" % "3.1.5",

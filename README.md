@@ -1,8 +1,9 @@
 # learning-tui4s
 
 A Scala 3 terminal UI project: a Midnight Commander-style folder browser (`jnz.FolderViewApp`) built on
-[TermFlow](https://llm4s.github.io/termflow/) (an Elm-architecture terminal UI framework for Scala 3).
-Earlier versions: [tui4s](https://github.com/yuri4n/tui4s)/kyo on the `kyo` branch, jatatui on the `jatatui` branch.
+[Lanterna](https://github.com/mabe02/lanterna) (a Java terminal library, used through its `Screen` API).
+Earlier versions: [tui4s](https://github.com/yuri4n/tui4s)/kyo on the `kyo` branch, jatatui on the `jatatui` branch,
+[TermFlow](https://llm4s.github.io/termflow/) on the `termflow` branch.
 
 ## Run
 
@@ -11,7 +12,7 @@ sbt stage
 target/universal/stage/bin/learning-tui4s
 ```
 
-`sbt run` does not work: the forked JVM has no tty, so the terminal has no size and the screen stays empty.
+`sbt run` does not work: the forked JVM has no tty, so Lanterna cannot take over the terminal.
 
 Keys: Up/Down (`k`/`j`), PageUp/PageDown, Home/End, Enter or Right to open a folder, Backspace or Left to go up,
 F10 or `q` to quit. Needs a real terminal.
