@@ -1,8 +1,6 @@
 package jnz
 
 import java.nio.file.Paths
-import jatatui.core.buffer.Buffer
-import jatatui.core.layout.Rect
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -20,11 +18,9 @@ class FolderViewSpec extends AnyFlatSpec with Matchers:
     State(Paths.get("/tmp/demo"), entries, selected, top, message)
 
   private def drawn(st: State, width: Int, height: Int): Vector[String] =
-    val buf = Buffer.empty(Rect.of(0, 0, width, height))
-    FolderView.render(st, Rect.of(0, 0, width, height), buf)
-    Vector.tabulate(height)(y => (0 until width).map(x => buf.cellAt(x, y).symbol()).mkString)
+    FolderView.lines(st, width, height).map(_._1)
 
-  "render" should "show the path, the visible entries and the key hints" in {
+  "lines" should "show the path, the visible entries and the key hints" in {
     val rows = drawn(state(selected = 1), 40, 6)
     rows.head.trim shouldBe "/tmp/demo"
     rows(1) should startWith("  ..")
@@ -56,4 +52,12 @@ class FolderViewSpec extends AnyFlatSpec with Matchers:
     drawn(state(), 40, 2).last.trim shouldBe FolderModel.footerKeys
     drawn(state(), 4, 6) should have size 6
     drawn(state(), 1, 1) should have size 1
+  }
+
+  it should "make the header and the selected entry bold" in {
+    FolderView.lines(state(selected = 1), 40, 6).map(_._2) shouldBe Vector(true, false, true, false, false, false)
+  }
+
+  "view" should "put a text node on every row of the terminal" in {
+    FolderView.view(state(), 40, 6).children should have size 6
   }

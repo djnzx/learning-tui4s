@@ -1,42 +1,28 @@
 package jnz
 
-import jatatui.core.buffer.Buffer
-import jatatui.core.layout.Rect
-import jatatui.core.style.Style
-import jatatui.core.terminal.Frame
-import jatatui.widgets.list.List as ListWidget
-import jatatui.widgets.list.ListItem
-import jatatui.widgets.list.ListState
-import jatatui.widgets.paragraph.Paragraph
-import java.util.Optional
-import scala.jdk.CollectionConverters.*
+import termflow.tui.*
+import termflow.tui.TuiPrelude.*
 
 object FolderView:
 
-  def draw(frame: Frame, st: State): Unit =
-    render(st, frame.area(), frame.bufferMut())
-
-  /** The header (the path), the list window and the footer (the message or the key hints) in `area`. */
-  def render(st: State, area: Rect, buf: Buffer): Unit =
-    val width  = area.width()
-    val page   = FolderModel.rows(area.height())
+  /** The `height` rows of the screen, each `width` cells wide: the header (the path), the list window and the footer (the message or the key hints). Bold marks the header and the selected entry. */
+  def lines(st: State, width: Int, height: Int): Vector[(String, Boolean)] =
+    val page   = FolderModel.rows(height)
     val top    = FolderModel.scroll(st.selected, st.top, page)
     val window = st.entries.slice(top, top + page)
     val items  = window.zipWithIndex.map { (e, i) =>
-      val mark = if top + i == st.selected then ">" else " "
-      ListItem.of(FolderModel.line(mark, e.name, FolderModel.sizeOf(e), width))
+      val selected = top + i == st.selected
+      (FolderModel.line(if selected then ">" else " ", e.name, FolderModel.sizeOf(e), width), selected)
     }
-    val chosen = Optional.of(Integer.valueOf(st.selected - top)).filter(_ => window.nonEmpty)
     val footer = if st.message.nonEmpty then st.message else FolderModel.footerKeys
+    val blank  = (FolderModel.fit("", width), false)
+    val body   = if height > 2 then (items ++ Vector.fill(page - items.size)(blank)).take(height - 2) else Vector.empty
+    val head   = Vector((FolderModel.fit(st.dir.toString, width), true))
+    val foot   = if height > 1 then Vector((FolderModel.fit(footer, width), false)) else Vector.empty
+    (head ++ body ++ foot).take(height)
 
-    Paragraph
-      .of(FolderModel.cut(st.dir.toString, width))
-      .withStyle(Style.empty().bold())
-      .render(Rect.of(area.x(), area.y(), width, math.min(1, area.height())), buf)
-    if area.height() > 2 then
-      val list = ListWidget.of(items.asJava).withHighlightStyle(Style.empty().bold())
-      list.render(Rect.of(area.x(), area.y() + 1, width, area.height() - 2), buf, ListState.empty().withSelected(chosen))
-    if area.height() > 1 then
-      Paragraph
-        .of(FolderModel.cut(footer, width))
-        .render(Rect.of(area.x(), area.y() + area.height() - 1, width, 1), buf)
+  def view(st: State, width: Int, height: Int): RootNode =
+    val nodes = lines(st, width, height).zipWithIndex.map { case ((text, bold), y) =>
+      VNode.TextNode(1.x, (y + 1).y, List(Text(text, Style(bold = bold))))
+    }
+    RootNode(width, height, nodes.toList, None)
