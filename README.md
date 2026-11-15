@@ -18,7 +18,8 @@ sbt stage
 target/universal/stage/bin/learning-tui4s
 ```
 
-`run` is forked with the terminal's stdin and stdout handed to the app (`build.sbt`), so Lanterna owns the terminal.
+`run` is forked (`build.sbt`) and the app opens `/dev/tty` itself (`SttyTerminal`), because sbt's piping of the forked app's
+stdin and stdout shows nothing in a real terminal.
 The terminal size comes from `stty size` (`SttyTerminal`): Lanterna's own query for it waits for ever in a terminal that
 does not answer the cursor-position request.
 

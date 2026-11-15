@@ -24,10 +24,8 @@ scalacOptions ++= Seq(
   "-Wvalue-discard"
 )
 
-/** Lanterna needs the real terminal: `sbt run` forks the app and hands it stdin and stdout, so the app owns the terminal */
+/** Lanterna needs the real terminal: `sbt run` forks the app, which opens /dev/tty itself, so sbt's piping of stdin and stdout is out of the way */
 run / fork := true
-run / connectInput := true
-run / outputStrategy := Some(StdoutOutput)
 
 enablePlugins(JavaAppPackaging)
 
